@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>PDF 업로드 및 보기</title>
+  <style>
+    .container {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .section {
+      flex: 1;
+      position: absolute;
+      height: 100%;
+      border: 1px solid #ccc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow-y: auto;
+    }
+
+    .section2 {
+      flex: 1;
+      position: absolute;
+      height: 100%;
+      border: 1px solid #ccc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow-y: auto;
+    }
+
+    #pdfUploader {
+      background: beige;
+      position: absolute;
+      width: 20%;
+    }
+
+    #pdfUploader header {
+      font-size: 20px;
+      position: absolute;
+      top: 10%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    #pdfUploader header2 {
+      font-size: 20px;
+      position: absolute;
+      top: 38%;
+      color: dodgerblue;
+    }
+
+    #pdfUploader text {
+      margin: 0px 0px 5px 5px;
+      font-size: 12px;
+      top: 12%;
+      text-align: center;
+      position: absolute;
+    }
+
+    #pdfUploader text2 {
+      margin: 0px 0px 5px 5px;
+      font-size: 15px;
+      top: 35%;
+      text-align: center;
+      position: absolute;
+    }
+
+    #pdfUploader text3 {
+      margin: 0px 0px 5px 5px;
+      font-size: 15px;
+      top: 54%;
+      text-align: center;
+      color: orangered;
+      position: absolute;
+    }
+
+    #pdfViewer {
+      position: absolute;
+      left: 20.75%;
+      height: 100%;
+      width: 49%;
+      overflow: auto;
+    }
+
+    #imageContainer {
+      display: block;
+      max-width: 100%;
+      margin: 0 auto;
+    }
+
+    #imageContainer-wrapper {
+      position: absolute;
+      left: 20.75%;
+      height: 100%;
+      width: 49%;
+      overflow: auto;
+    }
+
+    #pdfViewer canvas {
+      display: block;
+      max-width: 100%;
+      margin: 0 auto;
+    }
+
+    #description {
+      width: 30%;
+      left: 70%;
+    }
+
+    #zoomInBtn,
+    #zoomOutBtn {
+      position: absolute;
+      top: 10px;
+      padding: 5px;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      cursor: pointer;
+    }
+
+    #zoomInBtn {
+      left: 10px;
+    }
+
+    #zoomOutBtn {
+      left: 40px;
+    }
+
+    .button-container {
+      font-size: 16px; /* Set the button font size */
+      position: absolute;
+      align-items: center;
+      justify-content: center;
+      top: 26%;
+    }
+
+    .button-container2 {
+      font-size: 12px; /* Set the button font size */
+      position: absolute;
+      align-items: center;
+      background-size: 20px;
+      top: 49%;
+      left: 220px;
+      font-size: 10px;
+    }
+
+    button {
+      padding: 10px 20px; /* Adjust the button padding */
+      background-color: #4CAF50; /* Set the button background color */
+      color: black; /* Set the button text color */
+      border: none; /* Remove the button border */
+      cursor: pointer; /* Change the cursor style on hover */
+    }
+
+    button:hover {
+      background-color: #45a049; /* Change the button background color on hover */
+    }
+
+    hr {
+      color: gray;
+    }
+
+    h2 {
+      position: absolute;
+      height: 100%;
+    }
+
+    .block {
+      width: 430px;
+      background-color: antiquewhite;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      padding: 10px;
+    }
+
+    .title {
+      font-weight: bold;
+    }
+
+    #description {
+      margin-bottom: 30px;
+      position: absolute;
+      height: 100%;
+      overflow: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="pdfUploader" class="section">
+      <header>등기부등본?</header>
+      <text>토지와 건물 그리고 법인에 대한 공적공부로써<br>해당 부동산의 토지와 건물의 표시(지번, 지목, 구조, 면적 등)와<br>권리변동관계(지상권·저당권·전세권·가압류 등)와 채무상황을<br>알 수 있으며, 법인의 경우 상호와 본점, 자본(주식수와 가격),<br>법인 설립목적과 존재여부, 임원 등에 대한 정보를 담고 있어<br>일반인들이 쉽게 해당 부동산과 법인에 대한 정보를<br>확인할 수 있는 서류를 말합니다.</text>
+      <div class="button-container">
+          <button onclick="window.open('http://www.iros.go.kr/frontservlet?cmd=RISUWelcomeViewC&initFlag=Y&MenuID=IR010001&gFlag=N&addrCls=2')">등기부등본 발급</button>
+      </div>
+      <text2>본 매물의 도로명주소는</text2>
+      <br>
+      <header2>"서울시 동작구 상도동 507-17"<hr></header2>
+      <text3><u>발급받은 등기부등본(.pdf)을 업로드 해주세요!</u></text3>
+      <input type="file" name="pdfFileInput">
+    </div>
+    <div id="imageContainer-wrapper" class="section">
+      <div id="imageContainer" style="width: 100%; height: 100%;"></div>
+
+      <div id="zoomInBtn" class="zoomBtn">+</div>
+      <div id="zoomOutBtn" class="zoomBtn">-</div>
+    </div>
+    <div id="description" class="section2" >
+      <h2>등기부등본 열람법</h2>
+            <div class="block">
+                <div>.</div>
+                <div>.</div>
+                <div>.</div>
+                <div>.</div>
+                <div> </div>
+            </div>
+
+            <div class="block">
+                  <div class="title">[집합건물]</div>
+                  <div>--- 주소 ---</div>
+                  <div>건물의 주소 확인, 계약서에 적힌 주소와 같아야 함(호수 유의)</div>
+            </div>
+
+            <div class="block">
+              <div class="title">[표제부] (1동의 건물의 표시) / 건물내역</div>
+              <div>건축물의 용도 확인. 근린생활시설 → 주거용 건물이 아니기에 전세자금 대출이 어려울 수 있음</div>
+            </div>
+
+            <div class="block">
+              <div class="title">[표제부] (전유부분의 건물의 표시) / 건물내역</div>
+              <div>전유부분, 즉 건물에서 빌리려는 부분의 면적 확인. 임대차 계약 시에도 여기 적힌 만큼의 면적을 기재해야 함</div>
+            </div>
+
+            <div class="block">
+              <div class="title">[표제부] (전유부분의 건물의 표시) / (대지권의 표시) / 대지권 비율</div>
+              <div>소유권대지권이 있는지 확인</div>
+              <div>대지권: 임대인이 땅에 대해 가지는 권리 → 없으면 주택 가치가 하락할 수 있음</div>
+            </div>
+
+            <div class="block">
+              <div class="title">[표제부] (전유부분의 건물의 표시) / (대지권의 표시) / 등기원인 및 기타사항</div>
+              <div>별도등기가 있는지 확인 “별도등기 있음”</div>
+              <div>표기된 경우, 토지 등기부등본을 따로 확인해야 함</div>
+            </div>
+
+            <div class="block">
+              <div class="title">[갑구] (소유권에 관한 사항)</div>
+              <div>가장 아래에 적힌 소유자가 현재 집을 가진 소유자 = 계약할 수 있는 임대인</div>
+              <div>소유자의 개인정보를 확인하고 계약하는 임대인의 인적사항과 비교, 동일해야 함</div>
+            </div>
+
+            <div class="block">
+              <div class="title">[갑구] (소유권에 관한 사항)</div>
+              <div>압류 | 가압류 | 강제 경매개시결정 | 신탁 등이 있을 시 소유권을 제한함</div>
+              <div>전문가와 함께 정확한 사실관계 파악</div>
+            </div>
+
+            <div class="block">
+              <div class="title">[을구] (소유권 이외의 권리에 관한 사항)</div>
+              <div>근저당권설정 이라는 근저당권이 있는지 확인</div>
+              <div>"채권최고액(이하의 내용)" 을 가지고 경매에 넘어갈 경우를 생각해야 함</div>
+            </div>
+      </div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.min.js"></script>
+  <script>
+    // PDF 파일 업로드 이벤트 핸들러
+    const pdfFileInput = document.querySelector('input[name="pdfFileInput"]');
+    pdfFileInput.addEventListener('change', function (e) {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+      reader.onload = function () {
+        const typedarray = new Uint8Array(this.result);
+        convertPdfToImages(typedarray);
+      };
+      reader.readAsArrayBuffer(file);
+    });
+
+    // PDF를 이미지로 변환하여 보여주는 함수
+    async function convertPdfToImages(typedarray) {
+      const pdf = await pdfjsLib.getDocument(typedarray).promise;
+      const totalPages = pdf.numPages;
+      const imageContainer = document.getElementById('imageContainer');
+
+      for (let pageNumber = 1; pageNumber <= totalPages; pageNumber++) {
+        const page = await pdf.getPage(pageNumber);
+        const viewport = page.getViewport({ scale: 1.5 });
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+
+        await page.render({
+          canvasContext: context,
+          viewport: viewport,
+        }).promise;
+
+        imageContainer.appendChild(canvas);
+      }
+    }
+
+
+    // 이미지 확대/축소 기능
+    const zoomInBtn = document.getElementById('zoomInBtn');
+    const zoomOutBtn = document.getElementById('zoomOutBtn');
+    let scale = 1.5;
+
+    zoomInBtn.addEventListener('click', function () {
+      scale += 0.1;
+      setZoom(scale);
+    });
+
+    zoomOutBtn.addEventListener('click', function () {
+      scale -= 0.1;
+      setZoom(scale);
+    });
+
+    function setZoom(scale) {
+      const imageContainer = document.getElementById('imageContainer');
+      const images = imageContainer.getElementsByTagName('canvas');
+
+      for (let i = 0; i < images.length; i++) {
+        images[i].style.transform = `scale(${scale})`;
+      }
+    }
+  </script>
+</body>
+</html>

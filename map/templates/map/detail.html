@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"><!DOCTYPE html>
+    <style>
+        body {font-family: 'Malgun Gothic', dotum, '돋움', sans-serif;}
+        .textbody {
+            position:absolute;
+            top:0;left:50%;bottom:0;width:50%;
+            font-size:12px;
+            margin: 10px 10px 10px 10px;
+            overflow-y: scroll; /* 오른쪽 공간에 스크롤 적용 */
+        }
+
+        .property {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+
+        .property-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: gray;
+            max-width: 50%;
+            position: relative;
+        }
+
+        .property-content img {
+            width: 100%;
+            height: auto;
+            margin-bottom: 10px;
+        }
+        .property-content .slider {
+            position: relative;
+            overflow: hidden;
+        }
+        .property-content .slider .slides {
+            display: flex;
+            transition: transform 0.3s ease-in-out;
+        }
+        .property-content .slide {
+            width: 100%;
+            flex-shrink: 0;
+        }
+
+        .property-content .slider .prev,
+        .property-content .slider .next {
+            cursor: pointer;
+            padding: 5px;
+            background-color: #ccc;
+            color: black;
+            position: relative;
+            top: 50%;
+            transform: translateY(-50%);
+            border: 1px solid #ccc;
+            font-size: 15px; /* 버튼의 폰트 크기 조정 */
+            width: 50px; /* 버튼의 너비 조정 */
+            height: 30px; /* 버튼의 높이 조정 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .property-content .slider .prev {
+            top: 60px;
+        }
+
+        .property-content .slider .next {
+            top: 20px;
+            left: 92.5%;
+        }
+
+        .property h2, p1, p2, p3, p4 {
+            margin-left: 10px;
+        }
+        .property h1 {
+            margin-left: 6px;
+            line-height: 0.7;
+            font-size: 30px;
+        }
+
+        .property h2 {
+            line-height: 0.5;
+            font-size: 20px;
+            color: #333;
+        }
+
+        /* blue */
+        .property p1 {
+            line-height: 1;
+            font-size: 20px;
+            color: dodgerblue;
+        }
+
+        .property p2 {
+            line-height: 1.7;
+            font-size: 15px;
+            color: black;
+        }
+
+        .property p3 {
+            line-height: 1.5;
+            font-size: 11px;
+        }
+
+        .property p4 {
+            font-size: 15px;
+            color: dodgerblue;
+        }
+
+        .property table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .property table th,
+        .property table td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            font-size: 15px;
+        }
+        .property table th {text-align: center;}
+        .property table th:first-child,
+        .property table td:first-child {
+            width: 200px; /* 원하는 크기로 조절 */
+        }
+
+        .button-container {
+            position: absolute;
+            top: 12%; right: 5%;
+        }
+
+        button {
+            padding: 10px 20px; /* Adjust the button padding */
+            background-color: #4CAF50; /* Set the button background color */
+            color: white; /* Set the button text color */
+            font-size: 16px; /* Set the button font size */
+            border: none; /* Remove the button border */
+            cursor: pointer; /* Change the cursor style on hover */
+        }
+
+        button:hover {
+            background-color: #45a049; /* Change the button background color on hover */
+        }
+    </style>
+</head>
+<body>
+    <script type="text/javascript"></script>
+    <script>
+        function slidePrev() {
+            const slider = document.querySelector('.property-content .slider .slides');
+            const slideWidth = document.querySelector('.property-content .slide').offsetWidth;
+            const currentSlideIndex = Array.from(document.querySelectorAll('.property-content .slide')).findIndex(slide => slide.classList.contains('active'));
+
+            if (currentSlideIndex > 0) {
+                const prevSlideIndex = currentSlideIndex - 1;
+                const moveAmount = prevSlideIndex * slideWidth;
+                slider.style.transform = `translateX(-${moveAmount}px)`;
+
+                const activeSlide = document.querySelector('.property-content .slide.active');
+                const prevSlide = activeSlide.previousElementSibling;
+
+                activeSlide.classList.remove('active');
+                prevSlide.classList.add('active');
+            }
+        }
+
+        function slideNext() {
+            const slider = document.querySelector('.property-content .slider .slides');
+            const slideWidth = document.querySelector('.property-content .slide').offsetWidth;
+            const currentSlideIndex = Array.from(document.querySelectorAll('.property-content .slide')).findIndex(slide => slide.classList.contains('active'));
+            const totalSlides = document.querySelectorAll('.property-content .slide').length;
+
+            if (currentSlideIndex < totalSlides - 1) {
+                const nextSlideIndex = currentSlideIndex + 1;
+                const moveAmount = nextSlideIndex * slideWidth;
+                slider.style.transform = `translateX(-${moveAmount}px)`;
+
+                const activeSlide = document.querySelector('.property-content .slide.active');
+                const nextSlide = activeSlide.nextElementSibling;
+
+                activeSlide.classList.remove('active');
+                nextSlide.classList.add('active');
+            }
+        }
+    </script>
+
+    <div class="property-content">
+        <div class="slider">
+            <div class="slides">
+                <div class="slide active">
+                    <img src="https://landthumb-phinf.pstatic.net/20230530_278/land_naver_1685407782725TtTcQ_JPEG/1674535392518788.jpg?type=m1024" alt="room img">
+                </div>
+                <div class="slide">
+                    <img src="https://landthumb-phinf.pstatic.net/20230530_146/land_naver_1685407782732AiOPI_JPEG/1674535392409773.jpg?type=m1024" alt="room img">
+                </div>
+                <div class="slide">
+                    <img src="https://landthumb-phinf.pstatic.net/20230530_90/land_naver_1685407782727DCfIJ_JPEG/1674535392145792.jpg?type=m1024" alt="room img">
+                </div>
+            </div>
+            <div class="prev" onclick="slidePrev()">이전</div>
+            <div class="next" onclick="slideNext()">다음</div>
+        </div>
+    </div>
+    <div class="textbody">
+        <h2 id="title"></h2>
+        <div class="property">
+            <h2>매물 세부정보</h2>
+            <hr>
+            <h1>일반원룸 - 2층</h1>
+            <p1>월세 1,000/70</p1>
+            <div class="button-container">
+                <button onclick="window.location.href='homeinfo'">등기부등본 확인하기</button>
+            </div>
+            <table>
+                <tr>
+                    <th>소재지</th>
+                    <td>서울시 동작구 상도동 507-17</td>
+                </tr>
+                <tr>
+                    <th>매물특징</th>
+                    <td>숭실대학교후문앞 대로변 신축 분리형이에요</td>
+                </tr>
+                <tr>
+                    <th>공급/전용면적</th>
+                    <td>21㎡/19㎡(전용률90%)</td>
+                </tr>
+                <tr>
+                    <th>해당층/총층</th>
+                    <td>2/3층</td>
+                </tr>
+                <tr>
+                    <th>방수/욕실수</th>
+                    <td>1/1개</td>
+                </tr>
+                <tr>
+                    <th>월관리비</th>
+                    <td>6만원</td>
+                </tr>
+                <tr>
+                    <th>관리비포함</th>
+                    <td>인터넷, TV</td>
+                </tr>
+                <tr>
+                    <th>입주가능일</th>
+                    <td>2023년 06월 하순 협의가능</td>
+                </tr>
+                <tr>
+                    <th>융자금</th>
+                    <td>시세 대비 30% 미만</td>
+                </tr>
+                <tr>
+                    <th>사용승인일</th>
+                    <td>2019.02.12</td>
+                </tr>
+                <tr>
+                    <th>방향</th>
+                    <td>동향(거실 기준)</td>
+                </tr>
+                <tr>
+                    <th>주차가능여부</th>
+                    <td>불가능</td>
+                </tr>
+                <tr>
+                    <th>방구조</th>
+                    <td>분리형</td>
+                </tr>
+                <tr>
+                    <th>복층여부</th>
+                    <td>단층</td>
+                </tr>
+                <tr>
+                    <th>건축물용</th>
+                    <td>단독주택</td>
+                </tr>
+                <tr>
+                    <th>매물설명</th>
+                    <td>핵심포인트<br><br>-큰대로변에 위치하여 밤에도 안전!!<br>-신축2년된 구조좋고 인테리어좋은 원룸!!<br>-주방분리형 구조로 공간활용이 좋습니다.<br>일반원룸에 비해 가격대비 방 사이즈가 큼직합니다.<br>-집주인이 직접 관리하고 있어서 건물 자체가 굉장히 깔끔합니다.<br>-1층현관보안문이 설치되어았으며, CCTV가 다량 설치되어있어서 안전합니다.<br><br>주변환경 및 교통편<br><br>-7호선숭실대입구역이용이 가능합니다.<br>-숭실대학교와의 거리도 가깝고 큰대로변만을 이용하여 이동 가능합니다.<br>-인근에 초중고등학교가 인접해 있어서 좋습니다.<br>-큰대로변 바로 안쪽 여성분들특히 안전합니다.<br>-현관 주출입구 보안문이 설치되어있어 안전하며, CCTV또한 설치되어있습니다.<br>-도보 10분 거리에 대형마트나 재래시장이 인접해 있어 장을 보기에 매우 편리합니다.<br>-인근 상가들이 밀집하여 카페, 병원, 음식점 등 편의시설 풍부합니다.<br><br>가격<br><br>-보증금: 전세1억1천(전세자금대출 가능합니다.)<br><br>관리비<br><br>-월60,000원 전기,가스,수도별도입니다.<br>인터넷, TV회선, 정화조, 공용전기, 건물청소비포함되어있습니다.</td>
+                </tr>
+                <tr>
+                    <th>중개사</th>
+                    <td>**공인중개사사무소<br>소재지: 서울특별시 동작구 상도1동 000 **하우스 1층<br>전화: 010-0000-0000<br>최근 3개월 집주인확인 209건<br>매매 37 | 전세 110 | 월세 199 | 단기 3</td>
+                </tr>
+            </table>
+        </div>
+        <div class="property">
+            <h2>중개보수</h2>
+            <hr>
+            <p1>최대 30만원 (VAT 별도)</p1>
+            <br>
+            <p2>상한요율 0.4%</p2>
+        </div>
+        <div class="property">
+            <h2>주변 분양단지</h2>
+            <hr>
+            <p2>상도푸르지오클라베뉴</p2>
+            <br>
+            <p4>분양가 가격 미정</p4>
+            <br>
+            <p3>서울시 동작구 상도동 | 총 771세대</p3>
+        </div>
+    </div>
+</body>
+</html>

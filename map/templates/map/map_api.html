@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8"/>
+	<title>Kakao 지도</title>
+	<style>
+		/* 커스텀 오버레이 */
+		.wrap {position: absolute;left: 0;bottom: 40px;width: 288px;height: 132px;margin-left: -144px;text-align: left;overflow: hidden;font-size: 12px;font-family: 'Malgun Gothic', dotum, '돋움', sans-serif;line-height: 1.5;}
+		.wrap * {padding: 0;margin: 0;}
+		.wrap .info {width: 286px;height: 120px;border-radius: 5px;border-bottom: 2px solid #ccc;border-right: 1px solid #ccc;overflow: hidden;background: #fff;}
+		.wrap .info:nth-child(1) {border: 0;box-shadow: 0px 1px 2px #888;}
+		.info .title {padding: 5px 0 0 10px;height: 30px;background: #eee;border-bottom: 1px solid #ddd;font-size: 18px;font-weight: bold;}
+		.info .body {position: relative;overflow: hidden;}
+		.info .desc {position: relative;margin: 13px 0 0 90px;height: 75px;}
+		.desc .ellipsis {overflow: hidden;text-overflow: ellipsis;white-space: nowrap;}
+		.desc .jibun {font-size: 11px;color: #888;margin-top: -2px;}
+		.info .img {position: absolute;top: 6px;left: 5px;width: 73px;height: 71px;border: 1px solid #ddd;color: #888;overflow: hidden;}
+		.info:after {content: '';position: absolute;margin-left: -12px;left: 50%;bottom: 0;width: 22px;height: 12px;background: url('https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/vertex_white.png');}
+
+		/* 리스트 */
+		.map_wrap, .map_wrap * {margin:0;padding:0;font-family:'Malgun Gothic',dotum,'돋움',sans-serif;font-size:12px;}
+		.map_wrap a, .map_wrap a:hover, .map_wrap a:active{color:#000;text-decoration: none;}
+		.map_wrap {position:absolute;width:100%;height:100%;}
+		#menu_wrap {position:absolute;top:0;left:0;bottom:0;width:250px;margin:10px 0 30px 10px;padding:5px;overflow-y:auto;background:rgba(255, 255, 255, 0.7);z-index: 1;font-size:12px;border-radius: 10px;}
+		.bg_white {background:#fff;}
+		#menu_wrap hr {display: block; height: 1px;border: 0; border-top: 2px solid #5F5F5F;margin:3px 0;}
+		#menu_wrap .option{text-align: center;}
+		#menu_wrap .option p {margin:10px 0;}
+		#menu_wrap .option button {margin-left:5px;}
+		#placesList li {list-style: none;}
+		#placesList .item {position:relative;border-bottom:1px solid #888;overflow: hidden;cursor: pointer;min-height: 65px;}
+		#placesList .item span {display: block;margin-top:4px;}
+		#placesList .item h5, #placesList .item .info {text-overflow: ellipsis;overflow: hidden;white-space: nowrap;}
+		#placesList .item .info{padding:10px 0 10px 55px;}
+		#placesList .info .gray {color:#8a8a8a;}
+		#placesList .info .jibun {padding-left:26px;background:url(https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/places_jibun.png) no-repeat;}
+		#placesList .info .tel {color:#009900;}
+	</style>
+	</head>
+	<body>
+	<div id="map" style="width:100%;height:100%;position: absolute;"></div>
+	<div class="map_wrap">
+		<div id="menu_wrap" class="bg_white">
+			<div class="option">
+				<div>
+					<form onsubmit="searchPlaces(); return false;">
+						키워드 : <input type="text" value="" id="keyword" size="15">
+						<button type="submit">검색하기</button>
+					</form>
+				</div>
+			</div>
+			<hr>
+			<ul id="placesList"></ul>
+		</div>
+	</div>
+
+	<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=aed689524ae1215f86c5d14151787208"></script>
+	<script>
+		/* 지도 초기 생성 */
+		var mapContainer = document.getElementById('map');
+		var mapOption = {
+			center: new kakao.maps.LatLng(37.496333, 126.957234),
+			level: 3
+		};
+		var map = new kakao.maps.Map(mapContainer, mapOption); // 지도를 생성합니다
+
+
+		/* zoom in-out, 스카이뷰 */
+		// 일반 지도와 스카이뷰로 지도 타입을 전환할 수 있는 지도타입 컨트롤을 생성합니다
+		var mapTypeControl = new kakao.maps.MapTypeControl();
+
+		// 지도에 컨트롤을 추가해야 지도위에 표시됩니다
+		// kakao.maps.ControlPosition은 컨트롤이 표시될 위치를 정의하는데 TOPRIGHT는 오른쪽 위를 의미합니다
+		map.addControl(mapTypeControl, kakao.maps.ControlPosition.TOPRIGHT);
+
+		// 지도 확대 축소를 제어할 수 있는 줌 컨트롤을 생성합니다
+		var zoomControl = new kakao.maps.ZoomControl();
+		map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
+
+
+		/* 마커 표시 */
+		// 마커 info 객체
+		// info에 들어가야 할 정보 추가
+		var positions = [
+			{
+				title: '숭실대학교 창의관',
+				addr: '서울특별시 동작구 사당로 46 (상도동)',
+				jibun: '서울특별시 동작구 상도동 508',
+				phone: 'none',
+				image: "https://www.ssyenc.co.kr/file/record/395/_%EB%82%B4%EB%B6%805.jpg",
+				latlng: new kakao.maps.LatLng(37.494791347009, 126.95943902879)
+			},
+			{
+				title: '숭실대학교 정보과학관',
+				addr: '서울특별시 동작구 사당로 50 (상도동)',
+				jibun: '서울특별시 동작구 상도동 509',
+				phone: '02-820-0920',
+				image: "http://www.bigtest.or.kr/upload/2018552110_editor_image.jpg",
+				latlng: new kakao.maps.LatLng(37.494705526855, 126.95994559383)
+			},
+			{
+				title: '숭실대학교',
+				addr: '서울특별시 동작구 상도로 369 (상도동)',
+				jibun: '서울특별시 동작구 상도동 511',
+				phone: '02-820-0114',
+				image: "https://lh5.googleusercontent.com/p/AF1QipMUZrtlEreOSvXNFTBc1D77R3spngf0UyemgVs-=w426-h240-k-no",
+				latlng: new kakao.maps.LatLng(37.495938823365, 126.95437558238)
+			},
+			{
+				title: '일반원룸 - 2층',
+				addr: '서울특별시 동작구 상도로61길 68-6 (상도동)',
+				jibun: '서울특별시 동작구 상도동 507-17',
+				phone: '010-1234-5678',
+				image: "https://landthumb-phinf.pstatic.net/20230530_278/land_naver_1685407782725TtTcQ_JPEG/1674535392518788.jpg?type=m1024",
+				latlng: new kakao.maps.LatLng(37.494358838551, 126.95857970945)
+			}
+		];
+
+		// 마커 이미지
+		var imageSrc = "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png";
+		var imageSize = new kakao.maps.Size(24, 35)
+		var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize);
+
+		// 마커 배열
+		var marker = [];
+		var overlay = [];
+
+		// 마커, 오버레이 생성
+		for(var i = 0; i < 4; i++) {
+			marker[i] = new kakao.maps.Marker({
+				map: map, // 마커를 표시할 지도
+				position: positions[i].latlng, // 마커를 표시할 위치
+				image : markerImage // 마커 이미지
+			});
+
+			var content = '<div class="wrap">' +
+				'    <div class="info">' +
+				'        <div class="title">' + positions[i].title + '</div>' +
+				'        <div class="body">' +
+				'            <div class="img">' +
+				'                <img src=' + positions[i].image + ' width="73" height="70">' +
+				'           </div>' +
+				'            <div class="desc">' +
+				'                <div class="ellipsis">' + positions[i].addr + '</div>' +
+				'                <div class="jibun ellipsis">' + positions[i].jibun + '</div>' +
+				'                <div class="phone">' + positions[i].phone + ' </div>' +
+				'            </div>' +
+				'        </div>' +
+				'    </div>' +
+				'</div>';
+
+			overlay[i] = new kakao.maps.CustomOverlay({
+				content: content,
+				map: map,
+				position: positions[i].latlng
+			});
+
+			// 초기 오버레이 표시 X
+			overlay[i].setMap(null);
+		}
+
+		/* 커스텀 오버레이 클릭 이벤트 */
+		var click_1 = 0, click_2 = 0, click_3 = 0, click_4 = 0;
+
+		kakao.maps.event.addListener(marker[0], 'click', function() {
+			click_1++;
+			if(click_1 % 2 == 1) {
+				overlay[0].setMap(map);
+			}
+			else overlay[0].setMap(null);
+		});
+
+		kakao.maps.event.addListener(marker[1], 'click', function() {
+			click_2++;
+			if(click_2 % 2 == 1) {
+				overlay[1].setMap(map);
+			}
+			else overlay[1].setMap(null);
+		});
+
+		kakao.maps.event.addListener(marker[2], 'click', function() {
+			click_3++;
+			if(click_3 % 2 == 1) {
+				overlay[2].setMap(map);
+			}
+			else overlay[2].setMap(null);
+		});
+
+		kakao.maps.event.addListener(marker[3], 'click', function() {
+			click_4++;
+			if(click_4 % 2 == 1) {
+				overlay[3].setMap(map);
+			}
+			else overlay[3].setMap(null);
+		});
+
+		/* !!!!!! 문제: 인덱스 내용이 안 들어감 */
+
+		// 키워드 검색을 요청하는 함수입니다
+		function searchPlaces() {
+			var fragment = document.createDocumentFragment(),
+					listEl = document.getElementById('placesList'),
+					menuEl = document.getElementById('menu_wrap');
+
+			// 검색 결과 목록에 추가된 항목들을 제거합니다
+			removeAllChildNods(listEl);
+
+			// 지도에 표시되고 있는 마커를 제거합니다
+			removeMO();
+
+			var keyword = document.getElementById('keyword').value;
+
+			if (!keyword.replace(/^\s+|\s+$/g, '')) {
+				alert('키워드를 입력해주세요!');
+				return false;
+			}
+
+			// 장소검색 객체를 통해 키워드로 장소검색을 요청합니다
+			for(var i = 0; i < 4; i++){
+				// 키워드 탐색 조건
+				if(positions[i].title.includes(keyword)) {
+					// 일치하는 마커+오버레이 띄우기
+					marker[i].setMap(map);
+					overlay[i].setMap(map);
+
+					// 검색결과 항목들을 검색결과 목록 Element에 추가합니다
+					var itemEl = getListItem(positions[i], i); // 검색 결과 항목 Element를 생성합니다;
+					fragment.appendChild(itemEl);
+					listEl.appendChild(fragment);
+					menuEl.scrollTop = 0;
+				}
+			}
+		}
+
+		// 검색결과 항목을 Element로 반환하는 함수입니다
+		function getListItem(position, i) {
+			// detail.html로 data 전달
+			// Json Object를 저장하기
+			var index = i.toString();
+			localStorage.setItem('index', index);
+
+			var element = document.createElement('li'),
+			itemStr =
+					'<div class="info">' +
+						'<div onClick="location.href=\'detail\'" style="cursor: pointer;">' +
+						'	<h5>' + position.title + '</h5>' +
+						'	<span>' + position.addr + '</span>' +
+						'	<span class="jibun gray">' +  position.jibun  + '</span>' +
+						'	<span class="tel">' + position.phone  + '</span>' +
+						'</div>' +
+					'</div>;'
+
+			element.innerHTML = itemStr;
+			element.className = 'item';
+
+			return element;
+		}
+
+		 // 검색결과 목록의 자식 Element를 제거
+		function removeAllChildNods(el) {
+			while (el.hasChildNodes()) {
+				el.removeChild (el.lastChild);
+			}
+		}
+		function removeMO(){
+			for(var i = 0; i < 4; i++){
+				marker[i].setMap(null);
+				overlay[i].setMap(null);
+			}
+		}
+
+
+
+		/* 원룸, 투룸 등 종류별로 마커 이미지 다르게 표시 */
+		// https://apis.map.kakao.com/web/sample/categoryMarker/
+
+		/* 지도 위 버튼으로 로드뷰 토글*/
+		// https://apis.map.kakao.com/web/sample/roadviewWithMapButton/
+
+		/* 마커클러스터 마커 개수 표시 */
+		// https://apis.map.kakao.com/web/sample/addClustererClickEvent/
+
+	</script>
+</body>
+</html>
